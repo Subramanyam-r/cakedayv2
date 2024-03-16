@@ -6,8 +6,8 @@ import { useState } from "react";
 export function UsernameInput() {
     const [isFocused, setIsFocused] = useState(false)
     return <FormControl sx={{width: "100%" }} variant="outlined">
-        <InputLabel htmlFor="username-ip">Username</InputLabel>
-        <OutlinedInput id="username-ip" label="Username" 
+        <InputLabel htmlFor="username-ip">Email / Phone</InputLabel>
+        <OutlinedInput id="username-ip" label="Email / Phone" 
         startAdornment={<InputAdornment sx={{mr: theme.spacing(1)}}>
             <Icon color={isFocused ? "primary" : ""}>
                 <AccountCircle />
