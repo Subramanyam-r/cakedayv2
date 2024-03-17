@@ -3,17 +3,17 @@ import { FormControl, Icon, IconButton, InputAdornment, InputLabel, OutlinedInpu
 import { useState } from "react";
 import { theme } from "../Theme";
 
-export function PasswordInput({ password, setPassword }) {
+export function PasswordInput({ password, setPassword, label }) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
-    return <FormControl sx={{ width: "100%" }} variant="outlined">
+    return <FormControl sx={{ width: "100%", }} variant="outlined">
 
-        <InputLabel htmlFor="password-ip">Password</InputLabel>
+        <InputLabel htmlFor="password-ip">{label || "Password"}</InputLabel>
 
-        <OutlinedInput id="password-ip" label="Password"
-        type={isPasswordVisible ? "text" : "password"}
-            startAdornment={<InputAdornment sx={{ mr: theme.spacing(1) }}>
+        <OutlinedInput id="password-ip" label={label || "Password"}
+            type={isPasswordVisible ? "text" : "password"}
+            startAdornment={<InputAdornment position="start" sx={{ mr: theme.spacing(1) }}>
                 <Icon color={isFocused ? "primary" : ""}>
                     <Fingerprint />
                 </Icon>
@@ -28,7 +28,7 @@ export function PasswordInput({ password, setPassword }) {
             hidden={isPasswordVisible}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            />
+        />
 
     </FormControl>
 }
