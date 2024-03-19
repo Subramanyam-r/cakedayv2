@@ -4,11 +4,15 @@ import { useEffect } from "react";
 import { theme } from "../Theme";
 import { PasswordInput } from "./PasswordInput";
 import { UsernameInput } from "./UsernameInput";
-import { getOtp, isPhoneNumberBeingTyped } from "./Utils/login";
+import { getOtp, isPhoneNumberBeingTyped, signInWithEmail } from "./Utils/login";
+import { useSelector, useDispatch } from "react-redux"
+import authSlice from "../Redux/AuthSlice/authSlice";
 
-export default function LoginInputs({ username, setUsername, password,
-    setPassword, setAuthMode, setShowOtpScreen, setIsProgressing,
-    getOtpResponse, setGetOtpResponse }) {
+export default function LoginInputs() {
+
+        let dispatch = useDispatch();
+        let { username, password, getOtpResponse } = useSelector((state) => state.auth);
+        let { setUsername, setPassword, setGetOtpResponse, setAuthMode, setShowOtpScreen, setIsProgressing, setResendTimeout } = authSlice.actions;
 
     useEffect(() => {
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('get-otp-btn', {
@@ -16,33 +20,51 @@ export default function LoginInputs({ username, setUsername, password,
             "callback": () => { }
         });
     }, []);
+    
+    let recaptchaDiv = document.querySelector(".grecaptcha-badge");
+    if(recaptchaDiv)
+        recaptchaDiv.parentElement.style.position = "absolute";
 
     return <Stack direction="column" spacing={theme.spacing(2)} alignItems={"center"}>
-        <UsernameInput username={username} setUsername={setUsername} error={getOtpResponse} setError={setGetOtpResponse} />
+        <UsernameInput username={username} setUsername={(username) => dispatch(setUsername(username))} 
+        error={isPhoneNumberBeingTyped(username) ? getOtpResponse : null} 
+        setError={(getOtpResponse) => dispatch(setGetOtpResponse(getOtpResponse))} />
 
-        {!isPhoneNumberBeingTyped(username) && <PasswordInput password={password} setPassword={setPassword} />}
+        {!isPhoneNumberBeingTyped(username) && 
+            <PasswordInput password={password} setPassword={(password) => dispatch(setPassword(password))}
+            error={isPhoneNumberBeingTyped(username) ? null : getOtpResponse}
+            setError={(getOtpResponse) => dispatch(setGetOtpResponse(getOtpResponse))} />}
 
         <Button id="get-otp-btn" sx={{ width: "100%" }} variant="contained" onClick={async () => {
+            dispatch(setIsProgressing(true))
             if (isPhoneNumberBeingTyped(username)) {
                 if (username.length !== 10) {
-                    setGetOtpResponse(new Error("Please type a valid Phone Number"));
-                    return;
+                    dispatch(setGetOtpResponse("Please type a valid Phone Number"));
+                } else {
+                    let confirmationResult = await getOtp(username);
+                    if (!(confirmationResult instanceof Error)) {
+                        dispatch(setShowOtpScreen(true));
+                        window.otpVerificationId = confirmationResult.verificationId;
+                        dispatch(setResendTimeout(60));
+                    } else {
+                        dispatch(setGetOtpResponse(confirmationResult.message))
+                    }
                 }
 
-                setIsProgressing(true)
-                let confirmationResult = await getOtp(username);
-                if (!(confirmationResult instanceof Error)) {
-                    setShowOtpScreen(true);
-                    window.otpVerificationId = confirmationResult.verificationId;
+            } else {
+                let user = await signInWithEmail(username, password);
+                if (user instanceof Error) {
+                    dispatch(setGetOtpResponse(user.message))
                 }
-                setIsProgressing(false)
+                console.log(user)
             }
+            dispatch(setIsProgressing(false))
         }}>
             {isPhoneNumberBeingTyped(username) ? "Get OTP" : "Login"}
         </Button>
 
         <Box>
-            <ButtonBase sx={{ display: "block", py: 0.2, px: 1, borderRadius: 2 }} onClick={() => setAuthMode("signup")}>
+            <ButtonBase sx={{ display: "block", py: 0.2, px: 1, borderRadius: 2 }} onClick={() => dispatch(setAuthMode("signup"))}>
                 <Typography color="primary.main" fontWeight={500} fontSize={14}>
                     Create an account?
                 </Typography>

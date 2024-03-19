@@ -1,17 +1,13 @@
 import { CelebrationRounded } from "@mui/icons-material";
 import { Avatar, Box, Slide, Stack, Typography } from "@mui/material";
-import { useState } from "react";
 import { theme } from "../Theme";
 import LoginInputs from "./LoginInputs";
 import OTPInputs from "./OTPInputs";
+import { useSelector } from "react-redux";
 
-function Login({ setAuthMode, setIsProgressing }) {
-    const [password, setPassword] = useState("");
-    const [username, setUsername] = useState("");
-    const [showOtpScreen, setShowOtpScreen] = useState(false);
-    const [getOtpResponse, setGetOtpResponse] = useState(false);
+function Login() {
 
-    console.log(getOtpResponse)
+    let showOtpScreen = useSelector((state) => state.auth.showOtpScreen);
 
     return <Stack direction="column" spacing={theme.spacing(2)} alignItems={"center"}>
         <Stack sx={{ p: 1 }} direction={"column"} spacing={theme.spacing(1)} alignItems={"center"}>
@@ -27,26 +23,13 @@ function Login({ setAuthMode, setIsProgressing }) {
         <Stack direction={"row"}>
             <Slide direction={"right"} in={!showOtpScreen} mountOnEnter unmountOnExit>
                 <Box position={!showOtpScreen ? "initial" : "absolute"}>
-                    <LoginInputs username={username}
-                        password={password}
-                        setUsername={setUsername}
-                        setPassword={setPassword}
-                        setAuthMode={setAuthMode}
-                        setShowOtpScreen={setShowOtpScreen}
-                        setIsProgressing={setIsProgressing}
-                        getOtpResponse={getOtpResponse}
-                        setGetOtpResponse={setGetOtpResponse} />
+                    <LoginInputs />
                 </Box>
             </Slide>
 
             <Slide direction="left" in={showOtpScreen} mountOnEnter unmountOnExit >
                 <Box position={showOtpScreen ? "initial" : "absolute"}>
-                    <OTPInputs
-                        phoneNumber={username}
-                        setShowOtpScreen={setShowOtpScreen}
-                        getOtpResponse={getOtpResponse}
-                        setGetOtpResponse={setGetOtpResponse}
-                        setIsProgressing={setIsProgressing} />
+                    <OTPInputs />
                 </Box>
             </Slide>
         </Stack>

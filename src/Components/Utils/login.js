@@ -19,9 +19,19 @@ async function getOtp(phoneNumber) {
     }
 }
 
+async function signInWithEmail(email, password) {
+    try {
+        let userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        return userCredential.user;
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
 async function signOut() {
     await firebase.auth().signOut();
 }
 
-export { getOtp, isPhoneNumberBeingTyped, signOut };
+export { getOtp, isPhoneNumberBeingTyped, signOut, signInWithEmail };
 

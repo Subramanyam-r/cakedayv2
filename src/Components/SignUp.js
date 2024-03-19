@@ -3,12 +3,14 @@ import { theme } from "../Theme"
 import { CelebrationRounded } from "@mui/icons-material"
 import { PasswordInput } from "./PasswordInput"
 import { UsernameInput } from "./UsernameInput"
-import { useState } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import authSlice from "../Redux/AuthSlice/authSlice"
 
-function SignUp({ setAuthMode }) {
-    const [password, setPassword] = useState("");
-    const [retypePassword, setRetypePassword] = useState("");
-    const [username, setUsername] = useState("");
+function SignUp() {
+
+    let dispatch = useDispatch();
+    let { username, password, retypePassword, getOtpResponse } = useSelector(state => state.auth);
+    let { setUsername, setPassword, setRetypePassword, setAuthMode, setGetOtpResponse } = authSlice.actions;
 
     return <Stack display={"flex"} width="100%" direction="column" spacing={theme.spacing(2)} alignItems={"center"}>
         <Stack sx={{p: 1}} direction={"column"} spacing={theme.spacing(1)} alignItems={"center"}>
@@ -22,16 +24,26 @@ function SignUp({ setAuthMode }) {
         </Stack>
 
         <TextField fullWidth label="Name" />
-        <UsernameInput username={username} setUsername={setUsername} />
-        <PasswordInput password={password} setPassword={setPassword} />
-        <PasswordInput label="Retype Password" password={retypePassword} setPassword={setRetypePassword} />
+
+        <UsernameInput username={username} 
+        setUsername={(username) => dispatch(setUsername(username))}
+        setError={err => dispatch(setGetOtpResponse(err))} />
+
+        <PasswordInput password={password} 
+        setPassword={password => dispatch(setPassword(password))}
+        setError={err => dispatch(setGetOtpResponse(err))} />
+
+        <PasswordInput label="Retype Password" password={retypePassword} 
+        setPassword={password => dispatch(setRetypePassword(password))}
+        error={getOtpResponse}
+        setError={err => dispatch(setGetOtpResponse(err))} />
 
         <Button sx={{ width: "100%" }} variant="contained">
             SIGN UP
         </Button>
 
         <Box>
-            <ButtonBase sx={{display: "block", py: 0.2, px: 1, borderRadius: 2}} onClick={() => setAuthMode("login")}>
+            <ButtonBase sx={{display: "block", py: 0.2, px: 1, borderRadius: 2}} onClick={() => dispatch(setAuthMode("login"))}>
                 <Typography color="primary.main" fontWeight={500} fontSize={14}>
                     Already have an account?
                 </Typography>

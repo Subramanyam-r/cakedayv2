@@ -10,11 +10,11 @@ function renderUsernameLabel(username) {
     else return "Email"
 }
 
-export function UsernameInput({ username, setUsername, error, setError }) {
+export function UsernameInput({ username, setUsername, error = null, setError }) {
     const theme = useTheme();
 
     const [isFocused, setIsFocused] = useState(false)
-    return <FormControl error={error !== false}
+    return <FormControl error={error !== null}
         sx={{ width: theme.auth.spacing.inputFieldWidth }} variant="outlined">
 
         <InputLabel htmlFor="username-ip">{renderUsernameLabel(username)}</InputLabel>
@@ -31,9 +31,10 @@ export function UsernameInput({ username, setUsername, error, setError }) {
             value={username}
             onChange={(e) => {
                 setUsername(e.target.value);
+                setError(null);
             }} />
-
-        {error && <FormHelperText id="my-helper-text">{error.message}</FormHelperText>}
+    
+        {error && <FormHelperText id="my-helper-text">{error.split(".")[0].replaceAll("Firebase: ", "")}</FormHelperText>}
 
     </FormControl>
 }

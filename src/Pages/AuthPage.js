@@ -1,13 +1,19 @@
 import GoogleIcon from '@mui/icons-material/Google';
 import { Box, Card, Container, Divider, IconButton, LinearProgress, Slide, Stack, Typography } from "@mui/material";
-import { useState } from "react";
 import Login from "../Components/Login";
 import { SignUp } from "../Components/SignUp";
 import { theme } from "../Theme";
+import { useSelector } from "react-redux";
+import store from '../Redux/Store';
+import { useEffect } from 'react';
 
 function AuthPage() {
-    const [authMode, setAuthMode] = useState("login");
-    const [isProgressing, setIsProgressing] = useState(false)
+
+    let { authMode, isProgressing } = useSelector(state => state.auth);
+    
+    useEffect(() => {
+        store.subscribe(() => console.log(store.getState()));
+    }, []);
 
     return <div>
 
@@ -21,13 +27,13 @@ function AuthPage() {
                     <Stack direction={"row"}>
                         <Slide direction={"right"} in={authMode === "login"} mountOnEnter unmountOnExit>
                             <Box position={authMode !== "login" ? "Absolute" : "initial"}>
-                                <Login setAuthMode={setAuthMode} setIsProgressing={setIsProgressing} />
+                                <Login />
                             </Box>
                         </Slide>
 
                         <Slide direction="left" in={authMode === "signup"} mountOnEnter unmountOnExit >
                             <Box position={authMode !== "signup" ? "Absolute" : "initial"}>
-                                <SignUp setAuthMode={setAuthMode} />
+                                <SignUp />
                             </Box>
                         </Slide>
                     </Stack>
